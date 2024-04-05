@@ -85,7 +85,8 @@ INSERT INTO transaccion_moneda (id_transaccion, id_moneda) VALUES
 (2, 3),  -- La transacción 2 utiliza euros
 (3, 2),  -- La transacción 3 utiliza pesos chilenos
 (4, 1),  -- La transacción 4 utiliza dólares
-(5, 2);  -- La transacción 5 utiliza pesos chilenos
+(5, 2),  -- La transacción 5 utiliza pesos chilenos
+(6, 2);  -- La transacción 6 utiliza pesos chilenos
 
 -- Mostrar datos de la tabla moneda
 SELECT * FROM transaccion_moneda;
