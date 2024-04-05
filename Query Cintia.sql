@@ -35,9 +35,16 @@ simbolo_moneda VARCHAR(10) NOT NULL
 CREATE TABLE IF NOT EXISTS transaccion_moneda (
     id_transaccion INT NOT NULL,
     id_moneda INT NOT NULL,
-    FOREIGN KEY (id_transaccion) REFERENCES transaccion(id_transaccion),
+    FOREIGN KEY (id_transaccion) REFERENCES transaccion(id_transaccion), 
     FOREIGN KEY (id_moneda) REFERENCES moneda(id_moneda)
+    -- ON DELETE CASCADE, podría agregar esa sentencia para que cuándo se elimine una transacción, se pueda eliminar también en esta tabla
 );
+
+-- Modificar el tipo de dato de la columna  de INT a DECIMAL
+ALTER TABLE usuario MODIFY saldo DECIMAL(10, 2);
+
+-- Modificar el tipo de dato de la columna monto de INT a DECIMAL
+ALTER TABLE transaccion MODIFY monto DECIMAL(10, 2);
 
 -- Ingresar datos en tabla usuario
 INSERT INTO usuario (nombre_user, correo_electronico, contrasena, saldo) VALUES
@@ -88,15 +95,14 @@ SELECT * FROM transaccion_moneda;
 						-- CONSULTAS --
 						-- ---------- --
 
-/* 1.- Consulta para obtener el nombre de la moneda elegida por un
-usuario específico */
+/* 1.- Consulta para obtener el nombre de la moneda elegida por un usuario específico */
 SELECT usuario.nombre_user AS Usuario, 
 moneda.nombre_moneda AS Divisa
 FROM usuario
 INNER JOIN transaccion ON usuario.id_usuario = transaccion.emisor_user_id  -- se une tabla transaccion con tabla usuario
 INNER JOIN transaccion_moneda ON transaccion.id_transaccion = transaccion_moneda.id_transaccion -- se une tabla transaccion con tabla intermedia
 INNER JOIN moneda ON transaccion_moneda.id_moneda = moneda.id_moneda -- se une tabla moneda con tabla intermedia
-WHERE usuario.nombre_user = 'Pedro Rodríguez';
+WHERE usuario.nombre_user = 'Pedro Rodríguez'; -- Nombre del usuario 
 
 /* 2.- Consulta para obtener las transacciones realizadas por un usuario
 específico */
@@ -109,10 +115,10 @@ monto, fecha_transaccion AS fecha
 FROM usuario
 INNER JOIN transaccion ON usuario.id_usuario = transaccion.emisor_user_id
 INNER JOIN usuario AS usuario_receptor ON transaccion.receptor_user_id = usuario_receptor.id_usuario
-WHERE usuario.nombre_user = "María González";
+WHERE usuario.nombre_user = "María González"; -- Nombre de quién realiza la transacción
 
 /*3.- Consulta para obtener todos los usuarios registrados*/
-SELECT id_usuario AS id, nombre_user AS nombre,correo_electronico AS correo,saldo -- no muestro la contraseña
+SELECT id_usuario AS id, nombre_user AS nombre ,saldo -- no muestro la contraseña
 FROM usuario;
 
 /*4.- Consulta para obtener todas las monedas registradas*/
@@ -124,12 +130,12 @@ SELECT * FROM transaccion;
 /*6.- Consulta para obtener todas las transacciones recibidas por un
 usuario específico*/
 SELECT usuario.nombre_user AS Nombre_receptor, 
-	   receptor_user_id AS id_receptor,
-       usuario_emisor.nombre_user AS Nombre_emisor,
-       emisor_user_id AS id_emisor,
-       transaccion.id_transaccion AS numero_transaccion, 
+	   transaccion.receptor_user_id AS id_receptor,       
+       usuario_emisor.nombre_user AS Nombre_emisor, 
+       transaccion.emisor_user_id AS id_emisor, 
+       transaccion.id_transaccion AS numero_transaccion,  
        transaccion.monto, 
-       transaccion.fecha_transaccion AS fecha
+       transaccion.fecha_transaccion AS fecha 
 FROM usuario
 INNER JOIN transaccion ON usuario.id_usuario = transaccion.receptor_user_id
 INNER JOIN usuario AS usuario_emisor ON transaccion.emisor_user_id = usuario_emisor.id_usuario
@@ -143,6 +149,10 @@ UPDATE usuario SET correo_electronico = 'juan.p@mail.com' WHERE id_usuario = 1;
 la fila completa)*/
 DELETE FROM transaccion_moneda WHERE id_transaccion = 5;
 DELETE FROM transaccion WHERE id_transaccion = 5;
+/* *** Se puede eliminar la transacción directamente sin tener que eliminar primero de la tabla intermedia 
+si al crear la tabla agrego la sentencia ON DELETE CASCADE*/
+
 
 /*9.- Sentencia para DDL modificar el nombre de la columna correo_electronico por email*/
 ALTER TABLE usuario RENAME COLUMN correo_electronico TO email;
+
